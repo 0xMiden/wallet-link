@@ -106,8 +106,9 @@ function heading(dom) {
 const OPEN = 'https://bread.miden.xyz/open';
 // The link the wallet adapter builds: the page travels in the fragment, which browsers never send to a server.
 const breadLink = raw => `${OPEN}#url=${encodeURIComponent(raw)}`;
+const tag = '<script src="open.js"></script>';
 // Read without running the page, so a page that throws fails each case that loads it rather than the whole file.
-const markup = load(OPEN, MAC, page.replace('<script src="open.js"></script>', ''));
+const markup = load(OPEN, MAC, page.replace(tag, ''));
 const APP_STORE = markup.get('app-store')?.href;
 const PLAY_STORE = markup.get('play-store')?.href;
 
@@ -198,7 +199,6 @@ describe('the fallback page', () => {
 });
 
 describe('open.html', () => {
-  const tag = '<script src="open.js"></script>';
   const link = breadLink(ACCEPTED[0]);
 
   it('runs nothing without the script tag', () => {
