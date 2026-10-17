@@ -70,7 +70,7 @@ function browserWindow(link) {
  * Loads `html` as a browser opening `link` would: an element exists once the parser reaches it, and a script tag runs
  * the file it names right there, if the page's policy lets the page run its own scripts. Returns the elements that
  * have an id, with their `hidden`, `href` and `textContent`; a case that acts on the page after load passes its own
- * `window`.
+ * `window`. A page that reloads while it loads would reload forever, so that fails every case.
  */
 function load(link, { userAgent, maxTouchPoints }, html = page, window = browserWindow(link)) {
   const dom = new Map();
@@ -89,6 +89,7 @@ function load(link, { userAgent, maxTouchPoints }, html = page, window = browser
     if (id) dom.set(id, { hidden: /\shidden(\s|=|$)/.test(attributes), href: attribute('href'), textContent: '' });
     if (name === 'script' && attribute('src') && runsOwnScripts) vm.runInContext(read(attribute('src')), context);
   }
+  assert.equal(window.location.reloads, 0, 'the page reloads while it loads');
   return dom;
 }
 
