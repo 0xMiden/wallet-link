@@ -16,7 +16,7 @@ it('serves an Apple association file that opens /open in Bread', () => {
       details: [
         {
           appIDs: [APP_ID],
-          components: [{ '/': '/open', comment: "Opens the page named by ?url= in Bread's dApp browser" }]
+          components: [{ '/': '/open', comment: "Opens the page named by #url= in Bread's dApp browser" }]
         }
       ]
     }

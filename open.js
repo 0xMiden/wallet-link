@@ -1,9 +1,10 @@
 'use strict';
 
 // Must accept exactly the pages Bread opens (parseOpenLink in 0xMiden/wallet, src/lib/dapp-browser/open-link.ts):
-// this page must not offer a link the app refuses.
+// this page must not offer a link the app refuses. The link carries the page in its fragment, which browsers never
+// send to a server.
 function readTarget() {
-  const raw = new URLSearchParams(window.location.search).get('url');
+  const raw = new URLSearchParams(window.location.hash.slice(1)).get('url');
   if (!raw) return null;
   try {
     const url = new URL(raw);

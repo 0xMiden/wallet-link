@@ -6,7 +6,7 @@
         "components": [
           {
             "/": "/open",
-            "comment": "Opens the page named by ?url= in Bread's dApp browser"
+            "comment": "Opens the page named by #url= in Bread's dApp browser"
           }
         ]
       }

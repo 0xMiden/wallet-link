@@ -1,6 +1,6 @@
 # wallet-link
 
-The link host for Bread, the Miden mobile wallet. Served at `https://bread.miden.xyz`, it holds the files that let a link `https://bread.miden.xyz/open?url=<page>` open the page in Bread's dApp browser. Bread opens only https pages without credentials in the URL, and asks before opening a site it does not list.
+The link host for Bread, the Miden mobile wallet. Served at `https://bread.miden.xyz`, it holds the files that let a link `https://bread.miden.xyz/open#url=<page>` open the page in Bread's dApp browser. The page travels in the link's fragment, which browsers never send to a server. Bread opens only https pages without credentials in the URL, and asks before opening a site it does not list.
 
 | File | Read by | Must match, in [0xMiden/wallet](https://github.com/0xMiden/wallet) |
 | --- | --- | --- |
