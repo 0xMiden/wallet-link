@@ -48,16 +48,34 @@ const REFUSED = [
   ['an empty page', '']
 ];
 
+/** A window at `link` that keeps the listeners the page adds, so a case can fire them, and counts its reloads. */
+function browserWindow(link) {
+  const { search, hash } = new URL(link);
+  const listeners = [];
+  return {
+    location: {
+      search,
+      hash,
+      reloads: 0,
+      reload() {
+        this.reloads += 1;
+      }
+    },
+    addEventListener: (type, listener) => listeners.push({ type, listener }),
+    fire: type => listeners.filter(entry => entry.type === type).forEach(({ listener }) => listener())
+  };
+}
+
 /**
  * Loads `html` as a browser opening `link` would: an element exists once the parser reaches it, and a script tag runs
  * the file it names right there, if the page's policy lets the page run its own scripts. Returns the elements that
- * have an id, with their `hidden`, `href` and `textContent`.
+ * have an id, with their `hidden`, `href` and `textContent`; a case that acts on the page after load passes its own
+ * `window`.
  */
-function load(link, { userAgent, maxTouchPoints }, html = page) {
-  const { search, hash } = new URL(link);
+function load(link, { userAgent, maxTouchPoints }, html = page, window = browserWindow(link)) {
   const dom = new Map();
   const context = vm.createContext({
-    window: { location: { search, hash } },
+    window,
     document: { getElementById: id => dom.get(id) ?? null },
     navigator: { userAgent, maxTouchPoints },
     URL,
@@ -150,6 +168,17 @@ describe('the fallback page', () => {
 
     assert.deepEqual(offers(dom), ['get']);
     assert.equal(heading(dom), 'Open in Bread');
+  });
+
+  it('reloads when only the fragment changes', () => {
+    const link = breadLink(ACCEPTED[0]);
+    const tab = browserWindow(link);
+    load(link, IPHONE, page, tab);
+
+    tab.location.hash = new URL(breadLink(ACCEPTED[3])).hash;
+    tab.fire('hashchange');
+
+    assert.equal(tab.location.reloads, 1);
   });
 
   it(`treats ${IPAD_DESKTOP_SITE.name} as iOS`, () => {
