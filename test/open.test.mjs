@@ -5,7 +5,6 @@ import vm from 'node:vm';
 
 const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8');
 const page = read('open.html');
-const script = read('open.js');
 
 const IPHONE = {
   name: 'an iPhone',
@@ -49,28 +48,29 @@ const REFUSED = [
   ['an empty page', '']
 ];
 
-/** Every element of open.html that has an id, with its `hidden` and `href` as the markup sets them. */
-function elements() {
-  const found = new Map();
-  for (const [, attributes] of page.matchAll(/<[a-z0-9]+\s([^>]*\bid="[^"]+"[^>]*)>/g)) {
-    const id = /\bid="([^"]+)"/.exec(attributes)[1];
-    const href = /\bhref="([^"]+)"/.exec(attributes)?.[1];
-    found.set(id, { hidden: /(^|\s)hidden(\s|=|$)/.test(attributes), href, textContent: '' });
-  }
-  return found;
-}
-
-/** Runs open.js on open.html as a browser opening `link` would. */
-function load(link, { userAgent, maxTouchPoints }) {
+/**
+ * Loads `html` as a browser opening `link` would: an element exists once the parser reaches it, and a script tag runs
+ * the file it names right there, if the page's policy lets the page run its own scripts. Returns the elements that
+ * have an id, with their `hidden`, `href` and `textContent`.
+ */
+function load(link, { userAgent, maxTouchPoints }, html = page) {
   const { search, hash } = new URL(link);
-  const dom = elements();
-  vm.runInNewContext(script, {
+  const dom = new Map();
+  const context = vm.createContext({
     window: { location: { search, hash } },
     document: { getElementById: id => dom.get(id) ?? null },
     navigator: { userAgent, maxTouchPoints },
     URL,
     URLSearchParams
   });
+  const policy = /http-equiv="Content-Security-Policy" content="([^"]*)"/.exec(html)?.[1];
+  const runsOwnScripts = policy === undefined || /script-src [^;]*'self'/.test(policy);
+  for (const [, name, attributes] of html.matchAll(/<([a-z0-9]+)\b([^>]*)>/g)) {
+    const attribute = key => new RegExp(`\\s${key}="([^"]*)"`).exec(attributes)?.[1];
+    const id = attribute('id');
+    if (id) dom.set(id, { hidden: /\shidden(\s|=|$)/.test(attributes), href: attribute('href'), textContent: '' });
+    if (name === 'script' && attribute('src') && runsOwnScripts) vm.runInContext(read(attribute('src')), context);
+  }
   return dom;
 }
 
@@ -87,8 +87,9 @@ function heading(dom) {
 const OPEN = 'https://bread.miden.xyz/open';
 // The link the wallet adapter builds: the page travels in the fragment, which browsers never send to a server.
 const breadLink = raw => `${OPEN}#url=${encodeURIComponent(raw)}`;
-const { href: APP_STORE } = elements().get('app-store');
-const { href: PLAY_STORE } = elements().get('play-store');
+const desktopPage = load(OPEN, MAC);
+const { href: APP_STORE } = desktopPage.get('app-store');
+const { href: PLAY_STORE } = desktopPage.get('play-store');
 
 describe('the fallback page', () => {
   for (const raw of ACCEPTED) {

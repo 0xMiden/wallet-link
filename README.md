@@ -32,4 +32,4 @@ To check a deployment:
 
 ## Tests
 
-`node --test` (Node 22, no dependencies) checks both association files and runs `open.js` against `open.html` on iOS, Android and desktop for each page Bread opens or refuses.
+`node --test` (Node 22, no dependencies) checks both association files and loads `open.html` as a browser does, running `open.js` where its script tag sits, on iOS, Android and desktop for each page Bread opens or refuses.
