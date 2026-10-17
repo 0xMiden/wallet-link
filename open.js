@@ -55,3 +55,6 @@ if (os !== 'desktop') {
     );
   }
 }
+
+// Changing only the fragment does not load the page again, so the page reloads to follow it.
+window.addEventListener('hashchange', () => window.location.reload());
