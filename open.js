@@ -23,7 +23,7 @@ function platform() {
 
 function show(id, href) {
   const element = document.getElementById(id);
-  if (href) element.href = href;
+  element.href = href;
   element.hidden = false;
 }
 
@@ -34,8 +34,6 @@ const os = platform();
 
 if (target) {
   document.getElementById('host').textContent = target.host;
-  document.getElementById('title-generic').hidden = true;
-  show('title-target');
   show('continue', target.href);
 }
 
