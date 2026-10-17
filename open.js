@@ -1,9 +1,10 @@
 'use strict';
 
 // Must accept exactly the pages Bread opens (parseOpenLink in 0xMiden/wallet, src/lib/dapp-browser/open-link.ts):
-// this page must not offer a link the app refuses.
+// this page must not offer a link the app refuses. The link carries the page in its fragment, which browsers never
+// send to a server.
 function readTarget() {
-  const raw = new URLSearchParams(window.location.search).get('url');
+  const raw = new URLSearchParams(window.location.hash.slice(1)).get('url');
   if (!raw) return null;
   try {
     const url = new URL(raw);
@@ -22,7 +23,7 @@ function platform() {
 
 function show(id, href) {
   const element = document.getElementById(id);
-  if (href) element.href = href;
+  element.href = href;
   element.hidden = false;
 }
 
@@ -33,8 +34,6 @@ const os = platform();
 
 if (target) {
   document.getElementById('host').textContent = target.host;
-  document.getElementById('title-generic').hidden = true;
-  show('title-target');
   show('continue', target.href);
 }
 
@@ -56,3 +55,6 @@ if (os !== 'desktop') {
     );
   }
 }
+
+// Changing only the fragment does not load the page again, so the page reloads to follow it.
+window.addEventListener('hashchange', () => window.location.reload());
