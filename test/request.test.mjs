@@ -28,13 +28,14 @@ function intentData(url) {
 }
 
 describe('the request page', () => {
-  it("hands the request to Bread's scheme on iOS", () => {
-    const dom = load(LINK, IPHONE);
+  for (const agent of [IPHONE, IPAD_DESKTOP_SITE]) {
+    it(`offers only the App Store on ${agent.name}, where any app can claim Bread's scheme`, () => {
+      const dom = load(LINK, agent);
 
-    assert.deepEqual(offers(dom), ['get', 'open']);
-    assert.equal(dom.get('open').href, `com.miden.wallet://request${FRAGMENT}`);
-    assert.equal(dom.get('get').href, APP_STORE);
-  });
+      assert.deepEqual(offers(dom), ['get']);
+      assert.equal(dom.get('get').href, APP_STORE);
+    });
+  }
 
   it('hands the request to Bread on Android through an intent that falls back to Play', () => {
     const dom = load(LINK, ANDROID);
@@ -59,15 +60,13 @@ describe('the request page', () => {
     ['no version', '#m=eyJ9'],
     ['an empty message', '#v=1&m=']
   ]) {
-    for (const agent of [IPHONE, ANDROID]) {
-      it(`offers only the store for ${name} on ${agent.name}`, () => {
-        assert.deepEqual(offers(load(REQUEST + fragment, agent)), ['get']);
-      });
-    }
+    it(`offers only the store for ${name} on ${ANDROID.name}`, () => {
+      assert.deepEqual(offers(load(REQUEST + fragment, ANDROID)), ['get']);
+    });
   }
 
   it('ignores a request in the query', () => {
-    assert.deepEqual(offers(load(`${REQUEST}?${FRAGMENT.slice(1)}`, IPHONE)), ['get']);
+    assert.deepEqual(offers(load(`${REQUEST}?${FRAGMENT.slice(1)}`, ANDROID)), ['get']);
   });
 
   it('reloads when only the fragment changes', () => {
@@ -78,13 +77,6 @@ describe('the request page', () => {
     tab.fire('hashchange');
 
     assert.equal(tab.location.reloads, 1);
-  });
-
-  it(`treats ${IPAD_DESKTOP_SITE.name} as iOS`, () => {
-    const dom = load(LINK, IPAD_DESKTOP_SITE);
-
-    assert.deepEqual(offers(dom), ['get', 'open']);
-    assert.equal(dom.get('open').href, `com.miden.wallet://request${FRAGMENT}`);
   });
 
   it('links the store listings of Bread', () => {

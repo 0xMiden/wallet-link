@@ -30,17 +30,16 @@ const os = platform();
 if (os !== 'desktop') {
   document.getElementById('stores').hidden = true;
   show('get', os === 'ios' ? appStore : playStore);
-  if (request) {
-    // Android reads an intent URL's parameters after its last '#', so the request's own fragment stays in the data.
+  // Any iOS app can register Bread's scheme, so only Android's intent, naming Bread's package, carries the request.
+  // Android reads an intent URL's parameters after its last '#', so the request's own fragment stays in the data.
+  if (request && os === 'android') {
     show(
       'open',
-      os === 'ios'
-        ? 'com.miden.wallet://request' + request
-        : 'intent://request' +
-            request +
-            '#Intent;scheme=com.miden.wallet;package=com.miden.wallet;S.browser_fallback_url=' +
-            encodeURIComponent(playStore) +
-            ';end'
+      'intent://request' +
+        request +
+        '#Intent;scheme=com.miden.wallet;package=com.miden.wallet;S.browser_fallback_url=' +
+        encodeURIComponent(playStore) +
+        ';end'
     );
   }
 }
