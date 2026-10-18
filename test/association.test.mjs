@@ -10,13 +10,16 @@ const json = file => JSON.parse(readFileSync(path(file), 'utf8'));
 const APP_ID = 'LHU7B7J5WL.com.miden.bread';
 const PACKAGE = 'com.miden.wallet';
 
-it('serves an Apple association file that opens /open in Bread', () => {
+it('serves an Apple association file that opens /open and /request in Bread', () => {
   assert.deepEqual(json('.well-known/apple-app-site-association'), {
     applinks: {
       details: [
         {
           appIDs: [APP_ID],
-          components: [{ '/': '/open', comment: "Opens the page named by #url= in Bread's dApp browser" }]
+          components: [
+            { '/': '/open', comment: "Opens the page named by #url= in Bread's dApp browser" },
+            { '/': '/request', comment: 'Answers a Bread Connect request from a native app' }
+          ]
         }
       ]
     }

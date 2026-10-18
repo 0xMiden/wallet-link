@@ -7,6 +7,10 @@
           {
             "/": "/open",
             "comment": "Opens the page named by #url= in Bread's dApp browser"
+          },
+          {
+            "/": "/request",
+            "comment": "Answers a Bread Connect request from a native app"
           }
         ]
       }
