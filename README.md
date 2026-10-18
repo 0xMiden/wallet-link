@@ -20,8 +20,9 @@ Native apps reach Bread through Bread Connect links, `https://bread.miden.xyz/re
 | SHA-256 | Certificate |
 | --- | --- |
 | `36:C8:B0:3B:C5:5D:45:19:64:A7:41:D4:36:C7:B4:7F:CC:AA:D9:A2:44:20:E1:DE:05:7A:8F:64:03:61:6D:29` | upload key, which signs release builds before they go to Google Play, so it covers a release build installed directly |
+| `8B:C9:95:6B:54:07:27:1C:3B:97:A2:38:29:5D:A4:72:9E:1A:85:BB:39:1F:D7:D2:8C:74:5E:74:D2:12:B8:2D` | app signing key, with which Google Play re-signs every install it delivers |
 
-Google Play re-signs what it delivers with the app signing key, so links open Bread from Play installs only once that key's SHA-256, shown on the App integrity page of Play Console, is listed too.
+Play Console shows the app signing key on the Protected with Play page: expand the Play Store protection card and open Manage Play app signing, or go straight to `https://play.google.com/console/developers/<developer ID>/app/<app ID>/app-signing`. If that key is ever upgraded, add the new fingerprint here and to `BREAD_CERTIFICATES` in the wallet repository's Bread Connect Android clients before Google Play signs with it.
 
 ## Hosting
 
