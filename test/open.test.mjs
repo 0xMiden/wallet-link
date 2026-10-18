@@ -1,7 +1,18 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { ANDROID, IPAD_DESKTOP_SITE, IPHONE, MAC, browserWindow, loadPage, read } from './browser.mjs';
+import {
+  ANDROID,
+  ANDROID_TABLET_DESKTOP_SITE,
+  CHROMEBOOK,
+  IPAD_DESKTOP_SITE,
+  IPHONE,
+  LINUX,
+  MAC,
+  browserWindow,
+  loadPage,
+  read
+} from './browser.mjs';
 
 const page = read('open.html');
 
@@ -122,6 +133,24 @@ describe('the fallback page', () => {
     assert.equal(dom.get('open').href, `com.miden.wallet://open?url=${encodeURIComponent(ACCEPTED[0])}`);
     assert.equal(dom.get('get').href, APP_STORE);
   });
+
+  it(`treats ${ANDROID_TABLET_DESKTOP_SITE.name} as Android`, () => {
+    const dom = load(breadLink(ACCEPTED[0]), ANDROID_TABLET_DESKTOP_SITE);
+
+    assert.deepEqual(offers(dom), ['get', 'open', 'continue']);
+    assert.equal(
+      dom.get('open').href,
+      `intent://open?url=${encodeURIComponent(ACCEPTED[0])}` +
+        `#Intent;scheme=com.miden.wallet;package=com.miden.wallet;S.browser_fallback_url=${encodeURIComponent(PLAY_STORE)};end`
+    );
+    assert.equal(dom.get('get').href, PLAY_STORE);
+  });
+
+  for (const agent of [LINUX, CHROMEBOOK]) {
+    it(`treats ${agent.name} as a desktop`, () => {
+      assert.deepEqual(offers(load(breadLink(ACCEPTED[0]), agent)), ['stores', 'continue']);
+    });
+  }
 
   it('links the store listings of Bread', () => {
     assert.equal(APP_STORE, 'https://apps.apple.com/app/id6789341854');

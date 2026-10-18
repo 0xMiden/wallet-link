@@ -17,7 +17,9 @@ function readTarget() {
 function platform() {
   const ua = navigator.userAgent;
   if (/iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return 'ios';
-  if (/Android/.test(ua)) return 'android';
+  // Chrome on a large Android tablet asks for the desktop site, whose user agent names Linux, not Android. A
+  // touchscreen Linux computer matches too, and cannot run Bread either way.
+  if (/Android/.test(ua) || (/Linux/.test(ua) && navigator.maxTouchPoints > 1)) return 'android';
   return 'desktop';
 }
 

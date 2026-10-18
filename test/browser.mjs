@@ -22,11 +22,27 @@ export const ANDROID = {
     'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
   maxTouchPoints: 5
 };
+export const ANDROID_TABLET_DESKTOP_SITE = {
+  name: 'an Android tablet asking for the desktop site',
+  userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+  maxTouchPoints: 5
+};
 export const MAC = {
   name: 'a Mac',
   userAgent:
     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15',
   maxTouchPoints: 0
+};
+export const LINUX = {
+  name: 'a Linux computer without touch',
+  userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+  maxTouchPoints: 0
+};
+export const CHROMEBOOK = {
+  name: 'a Chromebook with touch',
+  userAgent:
+    'Mozilla/5.0 (X11; CrOS x86_64 14541.0.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+  maxTouchPoints: 5
 };
 
 /** A window at `link` that keeps the listeners the page adds, so a case can fire them, and counts its reloads. */

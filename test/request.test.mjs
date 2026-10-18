@@ -1,7 +1,18 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 
-import { ANDROID, IPAD_DESKTOP_SITE, IPHONE, MAC, browserWindow, loadPage, read } from './browser.mjs';
+import {
+  ANDROID,
+  ANDROID_TABLET_DESKTOP_SITE,
+  CHROMEBOOK,
+  IPAD_DESKTOP_SITE,
+  IPHONE,
+  LINUX,
+  MAC,
+  browserWindow,
+  loadPage,
+  read
+} from './browser.mjs';
 
 const page = read('request.html');
 const load = (link, agent, html = page, window = browserWindow(link)) => loadPage(html, link, agent, window);
@@ -37,22 +48,26 @@ describe('the request page', () => {
     });
   }
 
-  it('hands the request to Bread on Android through an intent that falls back to Play', () => {
-    const dom = load(LINK, ANDROID);
+  for (const agent of [ANDROID, ANDROID_TABLET_DESKTOP_SITE]) {
+    it(`hands the request to Bread on ${agent.name} through an intent that falls back to Play`, () => {
+      const dom = load(LINK, agent);
 
-    assert.deepEqual(offers(dom), ['get', 'open']);
-    assert.equal(
-      dom.get('open').href,
-      `intent://request${FRAGMENT}` +
-        `#Intent;scheme=com.miden.wallet;package=com.miden.wallet;S.browser_fallback_url=${encodeURIComponent(PLAY_STORE)};end`
-    );
-    assert.equal(intentData(dom.get('open').href), `com.miden.wallet://request${FRAGMENT}`);
-    assert.equal(dom.get('get').href, PLAY_STORE);
-  });
+      assert.deepEqual(offers(dom), ['get', 'open']);
+      assert.equal(
+        dom.get('open').href,
+        `intent://request${FRAGMENT}` +
+          `#Intent;scheme=com.miden.wallet;package=com.miden.wallet;S.browser_fallback_url=${encodeURIComponent(PLAY_STORE)};end`
+      );
+      assert.equal(intentData(dom.get('open').href), `com.miden.wallet://request${FRAGMENT}`);
+      assert.equal(dom.get('get').href, PLAY_STORE);
+    });
+  }
 
-  it('lists the phone apps on a desktop', () => {
-    assert.deepEqual(offers(load(LINK, MAC)), ['stores']);
-  });
+  for (const agent of [MAC, LINUX, CHROMEBOOK]) {
+    it(`lists the phone apps on ${agent.name}`, () => {
+      assert.deepEqual(offers(load(LINK, agent)), ['stores']);
+    });
+  }
 
   for (const [name, fragment] of [
     ['no fragment', ''],
